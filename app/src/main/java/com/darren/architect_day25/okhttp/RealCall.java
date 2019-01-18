@@ -47,7 +47,7 @@ public class RealCall implements Call{
         @Override
         protected void execute() {
             // 来这里，开始访问网络 Request -> Response
-            Log.e("TAG","execute");
+            Log.e("TAG", "execute");
             // Volley xUtils Afinal AsyHttpClient
             // 基于 HttpUrlConnection , OkHttp = Socket + okio(IO)
             final Request request = orignalRequest;
@@ -56,7 +56,7 @@ public class RealCall implements Call{
 
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                if(urlConnection instanceof HttpsURLConnection){
+                if (urlConnection instanceof HttpsURLConnection) {
                     HttpsURLConnection httpsURLConnection = (HttpsURLConnection) urlConnection;
                     // https 的一些操作
                     // httpsURLConnection.setHostnameVerifier();
@@ -69,28 +69,31 @@ public class RealCall implements Call{
                 urlConnection.setDoOutput(request.method.doOutput());
 
                 RequestBody requestBody = request.requestBody;
-                if(requestBody != null){
+                if (requestBody != null) {
                     // 头信息
-                    urlConnection.setRequestProperty("Content-Type",requestBody.getContentType());
-                    urlConnection.setRequestProperty("Content-Length",Long.toString(requestBody.getContentLength()));
+                    //设置传输文件的格式
+                    urlConnection.setRequestProperty("Content-Type", requestBody.getContentType());
+                    //设置我们将传输多少长度的信息
+                    urlConnection.setRequestProperty("Content-Length", Long.toString(requestBody.getContentLength()));
                 }
 
                 urlConnection.connect();
 
                 // 写内容
-                if(requestBody != null){
+                if (requestBody != null) {
                     requestBody.onWriteBody(urlConnection.getOutputStream());
                 }
 
                 int statusCode = urlConnection.getResponseCode();
-                if(statusCode == 200) {
+                if (statusCode == 200) {
                     InputStream inputStream = urlConnection.getInputStream();
                     Response response = new Response(inputStream);
-                    callback.onResponse(RealCall.this,response);
+                    callback.onResponse(RealCall.this, response);
                 }
                 // 进行一些列操作，状态码 200
-            } catch (IOException e) {
-                callback.onFailure(RealCall.this,e);
+            }catch (IOException e){
+
+                callback.onFailure(RealCall.this, e);
             }
         }
     }

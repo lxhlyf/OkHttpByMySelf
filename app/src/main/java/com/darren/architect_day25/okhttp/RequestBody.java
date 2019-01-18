@@ -31,7 +31,7 @@ public class RequestBody {
         return "OkHttp"+ UUID.randomUUID().toString();
     }
 
-    // 参数，文件
+    // 参数，文件  实际中不能用Map集合,会用到Builder设计模式
     private Map<String,Object> params;
     public RequestBody(){
         params = new HashMap<>();
@@ -48,6 +48,7 @@ public class RequestBody {
         for(Map.Entry<String,Object> entry:params.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
+
             if(value instanceof String){
                 String postTextStr = getText(key,(String)value);
                 Log.e("TAG",postTextStr);
@@ -104,8 +105,11 @@ public class RequestBody {
             if(value instanceof Bindry){
                 Bindry bindry = (Bindry) value;
                 String postTextStr = getText(key,bindry);
+                //写的是文件的信息
                 outputStream.write(postTextStr.getBytes());
+                //将写有文件的urlConnection的输出流传到bindry中，将文件中的内容写道这个输出流当中去
                 bindry.onWrite(outputStream);
+                //写入一个换行符
                 outputStream.write("\r\n".getBytes());
             }
         }
